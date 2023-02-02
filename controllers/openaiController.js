@@ -1,4 +1,3 @@
-//OpenAI Config
 const { Configuration, OpenAIApi } = require('openai');
 
 const configuration = new Configuration({
@@ -6,21 +5,25 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-
 const generateImage = async (req, res) => {
+    const { prompt, size } = req.body;
+
+    const imageSize =
+        size === 'small' ? '256x256' : size === 'medium' ? '512x512' : '1024x1024';
+
     try {
         const response = await openai.createImage({
-            prompt: 'Dennis Littlefield at a computer',
+            prompt,
             n: 1,
-            size: '512x512'
+            size: imageSize,
         });
-        const imageUrl = response.data.data[0].url
+
+        const imageUrl = response.data.data[0].url;
 
         res.status(200).json({
             success: true,
-            data: imageUrl
+            data: imageUrl,
         });
-
     } catch (error) {
         if (error.response) {
             console.log(error.response.status);
@@ -35,4 +38,5 @@ const generateImage = async (req, res) => {
         });
     }
 };
-module.exports = { generateImage }
+
+module.exports = { generateImage };
